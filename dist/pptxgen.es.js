@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-10-17T11:16:29.952Z */
+/* PptxGenJS 3.4.0-beta @ 2020-10-20T02:23:42.285Z */
 import * as JSZip from 'jszip';
 
 /**
@@ -2167,6 +2167,7 @@ function genXmlParagraphProperties(textObj, isDefault) {
  * @return {string} XML
  */
 function genXmlTextRunProperties(opts, isDefault) {
+    var _a;
     var runProps = '';
     var runPropsTag = isDefault ? 'a:defRPr' : 'a:rPr';
     // BEGIN runProperties (ex: `<a:rPr lang="en-US" sz="1600" b="1" dirty="0">`)
@@ -2174,9 +2175,25 @@ function genXmlTextRunProperties(opts, isDefault) {
     runProps += opts.fontSize ? ' sz="' + Math.round(opts.fontSize) + '00"' : ''; // NOTE: Use round so sizes like '7.5' wont cause corrupt pres.
     runProps += opts.bold ? ' b="1"' : '';
     runProps += opts.italic ? ' i="1"' : '';
-    runProps += opts.strike ? ' strike="sngStrike"' : '';
-    runProps += opts.underline || opts.hyperlink ? ' u="sng"' : '';
-    runProps += opts.subscript ? ' baseline="-40000"' : opts.superscript ? ' baseline="30000"' : '';
+    runProps += opts.strike ? " strike=\"" + (typeof opts.strike === "string" ? opts.strike : 'sngStrike') + "\"" : '';
+    if (typeof opts.underline === "object" && ((_a = opts.underline) === null || _a === void 0 ? void 0 : _a.type)) {
+        runProps += " u=\"" + opts.underline.type + "\"";
+    }
+    else if (typeof opts.underline === "string") {
+        runProps += " u=\"" + opts.underline + "\"";
+    }
+    else if (opts.underline || opts.hyperlink) {
+        runProps += ' u="sng"';
+    }
+    if (opts.baseline) {
+        runProps += " baseline=\"" + Math.round(opts.baseline * 50) + "\"";
+    }
+    else if (opts.subscript) {
+        runProps += ' baseline="-40000"';
+    }
+    else if (opts.superscript) {
+        runProps += ' baseline="30000"';
+    }
     runProps += opts.charSpacing ? ' spc="' + opts.charSpacing * 100 + '" kern="0"' : ''; // IMPORTANT: Also disable kerning; otherwise text won't actually expand
     runProps += ' dirty="0">';
     // Color / Font / Outline are children of <a:rPr>, so add them now before closing the runProperties tag
@@ -2207,6 +2224,10 @@ function genXmlTextRunProperties(opts, isDefault) {
         else if (opts.hyperlink.slide) {
             runProps += "<a:hlinkClick r:id=\"rId" + opts.hyperlink._rId + "\" action=\"ppaction://hlinksldjump\" tooltip=\"" + (opts.hyperlink.tooltip ? encodeXmlEntities(opts.hyperlink.tooltip) : '') + "\"/>";
         }
+    }
+    // underline color
+    if (typeof opts.underline === "object" && opts.underline.color) {
+        runProps += "<a:uFill><a:solidFill><a:srgbClr val=\"" + opts.underline.color + "\"/></a:solidFill></a:uFill>";
     }
     // END runProperties
     runProps += "</" + runPropsTag + ">";
