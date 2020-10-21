@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-10-20T07:31:04.408Z */
+/* PptxGenJS 3.4.0-beta @ 2020-10-21T09:48:20.433Z */
 import * as JSZip from 'jszip';
 
 /**
@@ -2213,6 +2213,10 @@ function genXmlTextRunProperties(opts, isDefault) {
             // NOTE: 'cs' = Complex Script, 'ea' = East Asian (use "-120" instead of "0" - per Issue #174); ea must come first (Issue #174)
             runProps += "<a:latin typeface=\"" + opts.fontFace + "\" pitchFamily=\"34\" charset=\"0\"/><a:ea typeface=\"" + opts.fontFace + "\" pitchFamily=\"34\" charset=\"-122\"/><a:cs typeface=\"" + opts.fontFace + "\" pitchFamily=\"34\" charset=\"-120\"/>";
         }
+    }
+    // highlight
+    if (opts.highlight) {
+        runProps += "<a:highlight><a:srgbClr val=\"" + opts.highlight + "\"/></a:highlight>";
     }
     // Hyperlink support
     if (opts.hyperlink) {
