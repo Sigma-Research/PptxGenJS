@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-10-21T10:13:37.219Z */
+/* PptxGenJS 3.4.0-beta @ 2020-10-26T06:54:38.369Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -2202,8 +2202,8 @@ function genXmlTextRunProperties(opts, isDefault) {
     }
     runProps += opts.charSpacing ? ' spc="' + opts.charSpacing * 100 + '" kern="0"' : ''; // IMPORTANT: Also disable kerning; otherwise text won't actually expand
     runProps += ' dirty="0">';
-    // Color / Highlight / Font / Outline are children of <a:rPr>, so add them now before closing the runProperties tag
-    if (opts.color || opts.fontFace || opts.outline) {
+    // Color / Highlight / Font / Outline / Underline color are children of <a:rPr>, so add them now before closing the runProperties tag
+    if (opts.color || opts.fontFace || opts.outline || typeof opts.underline === "object" && opts.underline.color) {
         if (opts.outline && typeof opts.outline === 'object') {
             runProps += "<a:ln w=\"" + valToPts(opts.outline.size || 0.75) + "\">" + genXmlColorSelection(opts.outline.color || 'FFFFFF') + "</a:ln>";
         }
@@ -2211,6 +2211,10 @@ function genXmlTextRunProperties(opts, isDefault) {
             runProps += genXmlColorSelection(opts.color);
         if (opts.highlight)
             runProps += "<a:highlight><a:srgbClr val=\"" + opts.highlight + "\"/></a:highlight>";
+        // underline color
+        if (typeof opts.underline === "object" && opts.underline.color) {
+            runProps += "<a:uFill><a:solidFill><a:srgbClr val=\"" + opts.underline.color + "\"/></a:solidFill></a:uFill>";
+        }
         if (opts.glow)
             runProps += "<a:effectLst>" + createGlowElement(opts.glow, DEF_TEXT_GLOW) + "</a:effectLst>";
         if (opts.fontFace) {
@@ -2232,10 +2236,6 @@ function genXmlTextRunProperties(opts, isDefault) {
         else if (opts.hyperlink.slide) {
             runProps += "<a:hlinkClick r:id=\"rId" + opts.hyperlink._rId + "\" action=\"ppaction://hlinksldjump\" tooltip=\"" + (opts.hyperlink.tooltip ? encodeXmlEntities(opts.hyperlink.tooltip) : '') + "\"/>";
         }
-    }
-    // underline color
-    if (typeof opts.underline === "object" && opts.underline.color) {
-        runProps += "<a:uFill><a:solidFill><a:srgbClr val=\"" + opts.underline.color + "\"/></a:solidFill></a:uFill>";
     }
     // END runProperties
     runProps += "</" + runPropsTag + ">";
