@@ -1164,7 +1164,7 @@ export function genXmlTextBody(slideObj: ISlideObject | TableCell): string {
 		if (!itext.text) itext.text = ''
 
 		// A: Set options
-		itext.options = itext.options || opts || {}
+		itext.options = itext.options || Object.assign({}, opts, { hyperlink: undefined }) || {}
 		if (idx === 0 && itext.options && !itext.options.bullet && opts.bullet) itext.options.bullet = opts.bullet
 
 		// B: Cast to text-object and fix line-breaks (if needed)
@@ -1246,7 +1246,7 @@ export function genXmlTextBody(slideObj: ISlideObject | TableCell): string {
 			// so the run building function cant just fallback to Slide.color, therefore, we need to do that here before passing options below.
 			Object.entries(opts).forEach(([key, val]) => {
 				// NOTE: This loop will pick up unecessary keys (`x`, etc.), but it doesnt hurt anything
-				if (key !== 'bullet' && !textObj.options[key]) textObj.options[key] = val
+				if (key !== 'bullet' && key !== 'hyperlink' && !textObj.options[key]) textObj.options[key] = val
 			})
 
 			// D: Add formatted textrun
