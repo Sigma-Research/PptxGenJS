@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-10-26T06:54:38.369Z */
+/* PptxGenJS 3.4.0-beta @ 2020-11-03T09:16:10.121Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -2414,7 +2414,7 @@ function genXmlTextBody(slideObj) {
         if (!itext.text)
             itext.text = '';
         // A: Set options
-        itext.options = itext.options || opts || {};
+        itext.options = itext.options || Object.assign({}, opts, { hyperlink: undefined }) || {};
         if (idx === 0 && itext.options && !itext.options.bullet && opts.bullet)
             itext.options.bullet = opts.bullet;
         // B: Cast to text-object and fix line-breaks (if needed)
@@ -2491,7 +2491,7 @@ function genXmlTextBody(slideObj) {
             Object.entries(opts).forEach(function (_a) {
                 var key = _a[0], val = _a[1];
                 // NOTE: This loop will pick up unecessary keys (`x`, etc.), but it doesnt hurt anything
-                if (key !== 'bullet' && !textObj.options[key])
+                if (key !== 'bullet' && key !== 'hyperlink' && !textObj.options[key])
                     textObj.options[key] = val;
             });
             // D: Add formatted textrun
@@ -3924,7 +3924,8 @@ function addTextDefinition(target, text, opts, isPlaceholder) {
     correctShadowOptions(opt.shadow);
     // STEP 4: Create hyperlinks
     if (typeof text === 'string' || typeof text === 'number')
-        newObject.text = [{ text: text, options: newObject.options }];
+        newObject.text = [{ text: text, options: Object.assign({}, newObject.options, { hyperlink: undefined }) }];
+    createHyperlinkRels(target, newObject);
     createHyperlinkRels(target, newObject.text || '');
     // LAST: Add object to Slide
     target._slideObjects.push(newObject);
