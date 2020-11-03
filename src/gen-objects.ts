@@ -977,7 +977,8 @@ export function addTextDefinition(target: PresSlide, text: string | TextProps[],
 	correctShadowOptions(opt.shadow)
 
 	// STEP 4: Create hyperlinks
-	if (typeof text === 'string' || typeof text === 'number') newObject.text = [{ text: text, options: newObject.options }]
+	if (typeof text === 'string' || typeof text === 'number') newObject.text = [{ text: text, options: Object.assign({}, newObject.options, { hyperlink: undefined }) }]
+	createHyperlinkRels(target, newObject)
 	createHyperlinkRels(target, newObject.text || '')
 
 	// LAST: Add object to Slide
