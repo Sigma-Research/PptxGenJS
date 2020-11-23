@@ -391,6 +391,7 @@ export interface TextBaseProps {
 	 * tab stops
 	 */
 	tabStops?: (number | string | {position: number | string; alignment: TabStopAlign})[]
+	objectName?: string
 }
 
 // image / media ==================================================================================
@@ -440,6 +441,7 @@ export interface ImageProps extends PositionProps, DataOrPathProps {
 		 */
 		y?: number
 	}
+	objectName?: string
 }
 /**
  * Add media (audio/video) to slide
@@ -464,6 +466,7 @@ export interface MediaProps extends PositionProps, DataOrPathProps {
 	 * @example '/sounds/simpsons_haha.mp3' // embed mp3 audio clip from local directory
 	 */
 	path?: string
+	objectName?: string
 }
 
 // shapes =========================================================================================
@@ -524,7 +527,7 @@ export interface ShapeProps extends PositionProps {
 	 * @since v3.3.0
 	 * @example 'Antenna Design 9'
 	 */
-	shapeName?: string
+	objectName?: string
 
 	/**
 	 * @depreacted v3.3.0
@@ -757,6 +760,7 @@ export interface TableProps extends PositionProps, TextBaseProps {
 	 * @deprecated v3.3.0 - use `autoPageSlideStartY`
 	 */
 	newSlideStartY?: number
+	objectName?: string
 }
 export interface TableCell {
 	_type: SLIDE_OBJECT_TYPES.tablecell
@@ -911,6 +915,7 @@ export interface TextPropsOptions extends PositionProps, DataOrPathProps, TextBa
 	 * @deprecated v3.3.0 - use `arrowTypeEnd`
 	 */
 	lineTail?: 'none' | 'arrow' | 'diamond' | 'oval' | 'stealth' | 'triangle'
+	objectName?: string
 }
 export interface TextProps {
 	text?: string
@@ -1001,6 +1006,7 @@ export interface IChartPropsBase {
 	v3DRAngAx?: boolean
 	v3DRotX?: number
 	v3DRotY?: number
+	objectName?: string
 }
 export interface IChartPropsAxisCat {
 	/**
@@ -1303,6 +1309,7 @@ export interface ObjectOptions extends ImageProps, PositionProps, ShapeProps, Ta
 	_placeholderIdx?: number
 	_placeholderType?: PLACEHOLDER_TYPES
 
+	objectName?: string
 	cx?: Coord
 	cy?: Coord
 	margin?: Margin

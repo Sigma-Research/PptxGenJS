@@ -1208,6 +1208,7 @@ declare namespace PptxGenJS {
 		 * tab stops
 		 */
 		tabStops?: (number | string | {position: number | string; alignment: TabStopAlign})[]
+		objectName?: string
 	}
 
 	// image / media ==================================================================================
@@ -1247,6 +1248,7 @@ declare namespace PptxGenJS {
 			x?: number
 			y?: number
 		}
+		objectName?: string
 	}
 	/**
 	 * Add media (audio/video) to slide
@@ -1271,6 +1273,7 @@ declare namespace PptxGenJS {
 		 * @example '/sounds/simpsons_haha.mp3' // embed mp3 audio clip from local directory
 		 */
 		path?: string
+		objectName?: string
 	}
 
 	// shapes =========================================================================================
@@ -1326,12 +1329,12 @@ declare namespace PptxGenJS {
 		 */
 		shadow?: ShadowProps
 		/**
-		 * Shape name
+		 * Object name
 		 * - used instead of default "Shape N" name
 		 * @since v3.3.0
 		 * @example 'Antenna Design 9'
 		 */
-		shapeName?: string
+		objectName?: string
 
 		/**
 		 * @depreacted v3.3.0
@@ -1559,6 +1562,7 @@ declare namespace PptxGenJS {
 		 * @deprecated v3.3.0 - use `autoPageSlideStartY`
 		 */
 		newSlideStartY?: number
+		objectName?: string
 	}
 	export interface TableCell {
 		text?: string | TableCell[]
@@ -1771,6 +1775,7 @@ declare namespace PptxGenJS {
 		v3DRAngAx?: boolean
 		v3DRotX?: number
 		v3DRotY?: number
+		objectName?: string
 	}
 	export interface IChartPropsAxisCat {
 		/**

@@ -383,6 +383,7 @@ export function addImageDefinition(target: PresSlide, opt: ImageProps) {
 		sizing: sizing,
 		placeholder: opt.placeholder,
 		rotate: opt.rotate || 0,
+		objectName: opt.objectName,
 	}
 
 	// STEP 4: Add this image to this Slide Rels (rId/rels count spans all slides! Count all images to get next rId)
@@ -489,6 +490,7 @@ export function addMediaDefinition(target: PresSlide, opt: MediaProps) {
 	slideData.options.y = intPosY
 	slideData.options.w = intSizeX
 	slideData.options.h = intSizeY
+	slideData.options.objectName = opt.objectName
 
 	// STEP 4: Add this media to this Slide Rels (rId/rels count spans all slides! Count all media to get next rId)
 	// NOTE: rId starts at 2 (hence the intRels+1 below) as slideLayout.xml is rId=1!
