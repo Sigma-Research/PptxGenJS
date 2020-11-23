@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-11-03T09:16:10.121Z */
+/* PptxGenJS 3.4.0-beta @ 2020-11-23T10:32:10.247Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -1435,6 +1435,7 @@ function slideObjectToXml(slide) {
             locationAttr += ' flipV="1"';
         if (slideItemObj.options.rotate)
             locationAttr += ' rot="' + convertRotationDegrees(slideItemObj.options.rotate) + '"';
+        var objectName = '';
         // B: Add OBJECT to the current Slide
         switch (slideItemObj._type) {
             case SLIDE_OBJECT_TYPES.table:
@@ -1449,15 +1450,14 @@ function slideObjectToXml(slide) {
                     cellOpts_1 = cell.options || null;
                     intColCnt_1 += cellOpts_1 && cellOpts_1.colspan ? Number(cellOpts_1.colspan) : 1;
                 });
+                objectName = objTabOpts_1.objectName ? encodeXmlEntities(objTabOpts_1.objectName) : "Table " + intTableNum * slide._slideNum;
                 // STEP 1: Start Table XML
                 // NOTE: Non-numeric cNvPr id values will trigger "presentation needs repair" type warning in MS-PPT-2013
                 var strXml_1 = '<p:graphicFrame>' +
                     '  <p:nvGraphicFramePr>' +
                     '    <p:cNvPr id="' +
                     (intTableNum * slide._slideNum + 1) +
-                    '" name="Table ' +
-                    intTableNum * slide._slideNum +
-                    '"/>' +
+                    '" name="' + objectName + '"/>' +
                     '    <p:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></p:cNvGraphicFramePr>' +
                     '    <p:nvPr><p:extLst><p:ext uri="{D42A27DB-BD31-4B8C-83A1-F6EECF244321}"><p14:modId xmlns:p14="http://schemas.microsoft.com/office/powerpoint/2010/main" val="1579011935"/></p:ext></p:extLst></p:nvPr>' +
                     '  </p:nvGraphicFramePr>' +
@@ -1673,7 +1673,7 @@ function slideObjectToXml(slide) {
                 break;
             case SLIDE_OBJECT_TYPES.text:
             case SLIDE_OBJECT_TYPES.placeholder:
-                var shapeName = slideItemObj.options.shapeName ? encodeXmlEntities(slideItemObj.options.shapeName) : "Object" + (idx + 1);
+                objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : "Object" + (idx + 1);
                 // Lines can have zero cy, but text should not
                 if (!slideItemObj.options.line && cy === 0)
                     cy = EMU * 0.3;
@@ -1693,7 +1693,7 @@ function slideObjectToXml(slide) {
                 // A: Start SHAPE =======================================================
                 strSlideXml += '<p:sp>';
                 // B: The addition of the "txBox" attribute is the sole determiner of if an object is a shape or textbox
-                strSlideXml += "<p:nvSpPr><p:cNvPr id=\"" + (idx + 2) + "\" name=\"" + shapeName + "\">";
+                strSlideXml += "<p:nvSpPr><p:cNvPr id=\"" + (idx + 2) + "\" name=\"" + objectName + "\">";
                 // <Hyperlink>
                 if (slideItemObj.options.hyperlink && slideItemObj.options.hyperlink.url)
                     strSlideXml +=
@@ -1775,10 +1775,11 @@ function slideObjectToXml(slide) {
                 strSlideXml += '</p:sp>';
                 break;
             case SLIDE_OBJECT_TYPES.image:
+                objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : "Object " + (idx + 1);
                 var sizing = slideItemObj.options.sizing, rounding = slideItemObj.options.rounding, width = cx, height = cy;
                 strSlideXml += '<p:pic>';
                 strSlideXml += '  <p:nvPicPr>';
-                strSlideXml += '    <p:cNvPr id="' + (idx + 2) + '" name="Object ' + (idx + 1) + '" descr="' + encodeXmlEntities(slideItemObj.image) + '">';
+                strSlideXml += '    <p:cNvPr id="' + (idx + 2) + '" name="' + objectName + '" descr="' + encodeXmlEntities(slideItemObj.image) + '">';
                 if (slideItemObj.hyperlink && slideItemObj.hyperlink.url)
                     strSlideXml +=
                         '<a:hlinkClick r:id="rId' +
@@ -1833,10 +1834,11 @@ function slideObjectToXml(slide) {
                 break;
             case SLIDE_OBJECT_TYPES.media:
                 if (slideItemObj.mtype === 'online') {
+                    objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : "Picture " + (idx + 1);
                     strSlideXml += '<p:pic>';
                     strSlideXml += ' <p:nvPicPr>';
                     // IMPORTANT: <p:cNvPr id="" value is critical - if not the same number as preview image rId, PowerPoint throws error!
-                    strSlideXml += ' <p:cNvPr id="' + (slideItemObj.mediaRid + 2) + '" name="Picture' + (idx + 1) + '"/>';
+                    strSlideXml += ' <p:cNvPr id="' + (slideItemObj.mediaRid + 2) + '" name="' + objectName + '"/>';
                     strSlideXml += ' <p:cNvPicPr/>';
                     strSlideXml += ' <p:nvPr>';
                     strSlideXml += '  <a:videoFile r:link="rId' + slideItemObj.mediaRid + '"/>';
@@ -1854,14 +1856,14 @@ function slideObjectToXml(slide) {
                     strSlideXml += '</p:pic>';
                 }
                 else {
+                    objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : slideItemObj.media.split('/').pop().split('.').shift();
                     strSlideXml += '<p:pic>';
                     strSlideXml += ' <p:nvPicPr>';
                     // IMPORTANT: <p:cNvPr id="" value is critical - if not the same number as preiew image rId, PowerPoint throws error!
                     strSlideXml +=
                         ' <p:cNvPr id="' +
                             (slideItemObj.mediaRid + 2) +
-                            '" name="' +
-                            slideItemObj.media.split('/').pop().split('.').shift() +
+                            '" name="' + objectName +
                             '"><a:hlinkClick r:id="" action="ppaction://media"/></p:cNvPr>';
                     strSlideXml += ' <p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr>';
                     strSlideXml += ' <p:nvPr>';
@@ -1885,9 +1887,10 @@ function slideObjectToXml(slide) {
                 }
                 break;
             case SLIDE_OBJECT_TYPES.chart:
+                objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : "Chart " + (idx + 1);
                 strSlideXml += '<p:graphicFrame>';
                 strSlideXml += ' <p:nvGraphicFramePr>';
-                strSlideXml += '   <p:cNvPr id="' + (idx + 2) + '" name="Chart ' + (idx + 1) + '"/>';
+                strSlideXml += '   <p:cNvPr id="' + (idx + 2) + '" name="' + objectName + '"/>';
                 strSlideXml += '   <p:cNvGraphicFramePr/>';
                 strSlideXml += '   <p:nvPr>' + genXmlPlaceholder(placeholderObj) + '</p:nvPr>';
                 strSlideXml += ' </p:nvGraphicFramePr>';
@@ -3350,6 +3353,7 @@ function addImageDefinition(target, opt) {
         sizing: sizing,
         placeholder: opt.placeholder,
         rotate: opt.rotate || 0,
+        objectName: opt.objectName,
     };
     // STEP 4: Add this image to this Slide Rels (rId/rels count spans all slides! Count all images to get next rId)
     if (strImgExtn === 'svg') {
@@ -3449,6 +3453,7 @@ function addMediaDefinition(target, opt) {
     slideData.options.y = intPosY;
     slideData.options.w = intSizeX;
     slideData.options.h = intSizeY;
+    slideData.options.objectName = opt.objectName;
     // STEP 4: Add this media to this Slide Rels (rId/rels count spans all slides! Count all media to get next rId)
     // NOTE: rId starts at 2 (hence the intRels+1 below) as slideLayout.xml is rId=1!
     if (strType === 'online') {
