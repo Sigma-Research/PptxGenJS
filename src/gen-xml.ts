@@ -402,7 +402,7 @@ function slideObjectToXml(slide: PresSlide | SlideLayout): string {
 
 			case SLIDE_OBJECT_TYPES.text:
 			case SLIDE_OBJECT_TYPES.placeholder:
-				objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : `Object${idx + 1}`
+				objectName = slideItemObj.options.objectName ? encodeXmlEntities(slideItemObj.options.objectName) : `Object ${idx + 1}`
 
 				// Lines can have zero cy, but text should not
 				if (!slideItemObj.options.line && cy === 0) cy = EMU * 0.3
