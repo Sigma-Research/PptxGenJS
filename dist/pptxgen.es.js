@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-11-25T10:31:09.656Z */
+/* PptxGenJS 3.4.0-beta @ 2020-12-04T07:15:23.387Z */
 import * as JSZip from 'jszip';
 
 /**
@@ -1526,7 +1526,7 @@ function slideObjectToXml(slide) {
                         var rowspan = (_b = cell.options) === null || _b === void 0 ? void 0 : _b.rowspan;
                         if (colspan && colspan > 1) {
                             var vMergeCells = new Array(colspan - 1).fill(undefined).map(function (_) {
-                                return { _type: SLIDE_OBJECT_TYPES.tablecell, optins: { rowspan: rowspan }, _hmerge: true };
+                                return { _type: SLIDE_OBJECT_TYPES.tablecell, options: { rowspan: rowspan }, _hmerge: true };
                             });
                             cells.splice.apply(cells, __spreadArrays([cIdx + 1, 0], vMergeCells));
                             cIdx += colspan;
