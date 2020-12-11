@@ -355,7 +355,7 @@ export interface TextBaseProps {
 	 * Font face name
 	 * @example 'Arial' // Arial font
 	 */
-	fontFace?: string
+	fontFace?: string | FontFace
 	/**
 	 * Font size
 	 * @example 12 // Font size 12
@@ -392,6 +392,12 @@ export interface TextBaseProps {
 	 */
 	tabStops?: (number | string | {position: number | string; alignment: TabStopAlign})[]
 	objectName?: string
+}
+
+export interface FontFace {
+	latin: string;
+	eastAsia?: string;
+	complexScript?: string;
 }
 
 // image / media ==================================================================================
@@ -1017,7 +1023,7 @@ export interface IChartPropsAxisCat {
 	catAxisHidden?: boolean
 	catAxisLabelColor?: string
 	catAxisLabelFontBold?: boolean
-	catAxisLabelFontFace?: string
+	catAxisLabelFontFace?: string | FontFace
 	catAxisLabelFontSize?: number
 	catAxisLabelFrequency?: string
 	catAxisLabelPos?: 'none' | 'low' | 'high' | 'nextTo'
@@ -1034,7 +1040,7 @@ export interface IChartPropsAxisCat {
 	catAxisOrientation?: 'minMax' | 'minMax'
 	catAxisTitle?: string
 	catAxisTitleColor?: string
-	catAxisTitleFontFace?: string
+	catAxisTitleFontFace?: string | FontFace
 	catAxisTitleFontSize?: number
 	catAxisTitleRotate?: number
 	catGridLine?: OptsChartGridLine
@@ -1050,7 +1056,7 @@ export interface IChartPropsAxisSer {
 	serAxisBaseTimeUnit?: string
 	serAxisHidden?: boolean
 	serAxisLabelColor?: string
-	serAxisLabelFontFace?: string
+	serAxisLabelFontFace?: string | FontFace
 	serAxisLabelFontSize?: string
 	serAxisLabelFrequency?: string
 	serAxisLabelPos?: 'none' | 'low' | 'high' | 'nextTo'
@@ -1062,7 +1068,7 @@ export interface IChartPropsAxisSer {
 	serAxisOrientation?: string
 	serAxisTitle?: string
 	serAxisTitleColor?: string
-	serAxisTitleFontFace?: string
+	serAxisTitleFontFace?: string | FontFace
 	serAxisTitleFontSize?: number
 	serAxisTitleRotate?: number
 	serGridLine?: OptsChartGridLine
@@ -1086,7 +1092,7 @@ export interface IChartPropsAxisVal {
 	valAxisHidden?: boolean
 	valAxisLabelColor?: string
 	valAxisLabelFontBold?: boolean
-	valAxisLabelFontFace?: string
+	valAxisLabelFontFace?: string | FontFace
 	valAxisLabelFontSize?: number
 	valAxisLabelFormatCode?: string
 	valAxisLabelPos?: 'none' | 'low' | 'high' | 'nextTo'
@@ -1100,7 +1106,7 @@ export interface IChartPropsAxisVal {
 	valAxisOrientation?: 'minMax' | 'minMax'
 	valAxisTitle?: string
 	valAxisTitleColor?: string
-	valAxisTitleFontFace?: string
+	valAxisTitleFontFace?: string | FontFace
 	valAxisTitleFontSize?: number
 	valAxisTitleRotate?: number
 	valGridLine?: OptsChartGridLine
@@ -1145,7 +1151,7 @@ export interface IChartPropsDataLabel {
 	dataLabelBkgrdColors?: boolean
 	dataLabelColor?: string
 	dataLabelFontBold?: boolean
-	dataLabelFontFace?: string
+	dataLabelFontFace?: string | FontFace
 	dataLabelFontSize?: number
 	/**
 	 * Data label format code
@@ -1175,7 +1181,7 @@ export interface IChartPropsDataTable {
 }
 export interface IChartPropsLegend {
 	legendColor?: string
-	legendFontFace?: string
+	legendFontFace?: string | FontFace
 	legendFontSize?: number
 	legendPos?: 'b' | 'l' | 'r' | 't' | 'tr'
 }
@@ -1183,7 +1189,7 @@ export interface IChartPropsTitle {
 	title?: string
 	titleAlign?: string
 	titleColor?: string
-	titleFontFace?: string
+	titleFontFace?: string | FontFace
 	titleFontSize?: number
 	titlePos?: { x: number; y: number }
 	titleRotate?: number

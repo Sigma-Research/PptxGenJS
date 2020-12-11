@@ -17,6 +17,7 @@ import {
 	SLIDE_OBJECT_TYPES,
 } from './core-enums'
 import {
+	FontFace,
 	IPresentationProps,
 	ISlideObject,
 	ISlideRel,
@@ -690,14 +691,7 @@ function slideObjectToXml(slide: PresSlide | SlideLayout): string {
 			strSlideXml += '<a:defRPr sz="' + (slide._slideNumberProps.fontSize ? Math.round(slide._slideNumberProps.fontSize) : '12') + '00">'
 			if (slide._slideNumberProps.color) strSlideXml += genXmlColorSelection(slide._slideNumberProps.color)
 			if (slide._slideNumberProps.fontFace)
-				strSlideXml +=
-					'<a:latin typeface="' +
-					slide._slideNumberProps.fontFace +
-					'"/><a:ea typeface="' +
-					slide._slideNumberProps.fontFace +
-					'"/><a:cs typeface="' +
-					slide._slideNumberProps.fontFace +
-					'"/>'
+				strSlideXml += genFontFaceXml(slide._slideNumberProps.fontFace)
 			strSlideXml += '</a:defRPr>'
 		}
 		strSlideXml += '</a:lvl1pPr></a:lstStyle>'
@@ -711,6 +705,17 @@ function slideObjectToXml(slide: PresSlide | SlideLayout): string {
 
 	// LAST: Return
 	return strSlideXml
+}
+
+export function genFontFaceXml (fontFace?: string | FontFace) {
+	if (!fontFace) return ''
+	const latin = typeof fontFace === "string" ? fontFace : fontFace.latin
+	const ea = typeof fontFace === "string" ? fontFace : fontFace.eastAsia || latin
+	const cs = typeof fontFace === "string" ? fontFace : fontFace.complexScript || latin
+	// NOTE: 'cs' = Complex Script, 'ea' = East Asia (use "-120" instead of "0" - per Issue #174); ea must come first (Issue #174)
+	return '<a:latin typeface="' + latin + '" pitchFamily="34" charset="0"/>'
+		+ '<a:ea typeface="' + ea + '" pitchFamily="34" charset="-122"/>'
+		+ '<a:cs typeface="' + cs + '" pitchFamily="34" charset="-120"/>'
 }
 
 /**
@@ -983,8 +988,7 @@ function genXmlTextRunProperties(opts: ObjectOptions | TextPropsOptions, isDefau
 		}
 		if (opts.glow) runProps += `<a:effectLst>${createGlowElement(opts.glow, DEF_TEXT_GLOW)}</a:effectLst>`
 		if (opts.fontFace) {
-			// NOTE: 'cs' = Complex Script, 'ea' = East Asian (use "-120" instead of "0" - per Issue #174); ea must come first (Issue #174)
-			runProps += `<a:latin typeface="${opts.fontFace}" pitchFamily="34" charset="0"/><a:ea typeface="${opts.fontFace}" pitchFamily="34" charset="-122"/><a:cs typeface="${opts.fontFace}" pitchFamily="34" charset="-120"/>`
+			runProps += genFontFaceXml(opts.fontFace)
 		}
 	}
 
@@ -1287,9 +1291,7 @@ export function genXmlTextBody(slideObj: ISlideObject | TableCell): string {
 		if (slideObj._type === SLIDE_OBJECT_TYPES.tablecell && (opts.fontSize || opts.fontFace)) {
 			if (opts.fontFace) {
 				strSlideXml += `<a:endParaRPr lang="${opts.lang || 'en-US'}"` + (opts.fontSize ? ` sz="${Math.round(opts.fontSize)}00"` : '') + ' dirty="0">'
-				strSlideXml += `<a:latin typeface="${opts.fontFace}" charset="0"/>`
-				strSlideXml += `<a:ea typeface="${opts.fontFace}" charset="0"/>`
-				strSlideXml += `<a:cs typeface="${opts.fontFace}" charset="0"/>`
+				strSlideXml += genFontFaceXml(opts.fontFace)
 				strSlideXml += '</a:endParaRPr>'
 			} else {
 				strSlideXml += `<a:endParaRPr lang="${opts.lang || 'en-US'}"` + (opts.fontSize ? ` sz="${Math.round(opts.fontSize)}00"` : '') + ' dirty="0"/>'
