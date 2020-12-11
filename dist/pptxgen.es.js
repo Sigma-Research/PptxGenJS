@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-12-04T07:15:23.387Z */
+/* PptxGenJS 3.4.0-beta @ 2020-12-11T10:47:16.512Z */
 import * as JSZip from 'jszip';
 
 /**
@@ -1941,14 +1941,7 @@ function slideObjectToXml(slide) {
             if (slide._slideNumberProps.color)
                 strSlideXml += genXmlColorSelection(slide._slideNumberProps.color);
             if (slide._slideNumberProps.fontFace)
-                strSlideXml +=
-                    '<a:latin typeface="' +
-                        slide._slideNumberProps.fontFace +
-                        '"/><a:ea typeface="' +
-                        slide._slideNumberProps.fontFace +
-                        '"/><a:cs typeface="' +
-                        slide._slideNumberProps.fontFace +
-                        '"/>';
+                strSlideXml += genFontFaceXml(slide._slideNumberProps.fontFace);
             strSlideXml += '</a:defRPr>';
         }
         strSlideXml += '</a:lvl1pPr></a:lstStyle>';
@@ -1960,6 +1953,17 @@ function slideObjectToXml(slide) {
     strSlideXml += '</p:cSld>';
     // LAST: Return
     return strSlideXml;
+}
+function genFontFaceXml(fontFace) {
+    if (!fontFace)
+        return '';
+    var latin = typeof fontFace === "string" ? fontFace : fontFace.latin;
+    var ea = typeof fontFace === "string" ? fontFace : fontFace.eastAsia || latin;
+    var cs = typeof fontFace === "string" ? fontFace : fontFace.complexScript || latin;
+    // NOTE: 'cs' = Complex Script, 'ea' = East Asia (use "-120" instead of "0" - per Issue #174); ea must come first (Issue #174)
+    return '<a:latin typeface="' + latin + '" pitchFamily="34" charset="0"/>'
+        + '<a:ea typeface="' + ea + '" pitchFamily="34" charset="-122"/>'
+        + '<a:cs typeface="' + cs + '" pitchFamily="34" charset="-120"/>';
 }
 /**
  * Transforms slide relations to XML string.
@@ -2219,8 +2223,7 @@ function genXmlTextRunProperties(opts, isDefault) {
         if (opts.glow)
             runProps += "<a:effectLst>" + createGlowElement(opts.glow, DEF_TEXT_GLOW) + "</a:effectLst>";
         if (opts.fontFace) {
-            // NOTE: 'cs' = Complex Script, 'ea' = East Asian (use "-120" instead of "0" - per Issue #174); ea must come first (Issue #174)
-            runProps += "<a:latin typeface=\"" + opts.fontFace + "\" pitchFamily=\"34\" charset=\"0\"/><a:ea typeface=\"" + opts.fontFace + "\" pitchFamily=\"34\" charset=\"-122\"/><a:cs typeface=\"" + opts.fontFace + "\" pitchFamily=\"34\" charset=\"-120\"/>";
+            runProps += genFontFaceXml(opts.fontFace);
         }
     }
     // Hyperlink support
@@ -2509,9 +2512,7 @@ function genXmlTextBody(slideObj) {
         if (slideObj._type === SLIDE_OBJECT_TYPES.tablecell && (opts.fontSize || opts.fontFace)) {
             if (opts.fontFace) {
                 strSlideXml += "<a:endParaRPr lang=\"" + (opts.lang || 'en-US') + "\"" + (opts.fontSize ? " sz=\"" + Math.round(opts.fontSize) + "00\"" : '') + ' dirty="0">';
-                strSlideXml += "<a:latin typeface=\"" + opts.fontFace + "\" charset=\"0\"/>";
-                strSlideXml += "<a:ea typeface=\"" + opts.fontFace + "\" charset=\"0\"/>";
-                strSlideXml += "<a:cs typeface=\"" + opts.fontFace + "\" charset=\"0\"/>";
+                strSlideXml += genFontFaceXml(opts.fontFace);
                 strSlideXml += '</a:endParaRPr>';
             }
             else {
@@ -4696,9 +4697,7 @@ function makeXmlCharts(rel) {
                 if (rel.opts.legendColor)
                     strXml += genXmlColorSelection(rel.opts.legendColor);
                 if (rel.opts.legendFontFace)
-                    strXml += '<a:latin typeface="' + rel.opts.legendFontFace + '"/>';
-                if (rel.opts.legendFontFace)
-                    strXml += '<a:cs    typeface="' + rel.opts.legendFontFace + '"/>';
+                    strXml += genFontFaceXml(rel.opts.legendFontFace);
                 strXml += '      </a:defRPr>';
                 strXml += '    </a:pPr>';
                 strXml += '    <a:endParaRPr lang="en-US"/>';
@@ -4838,7 +4837,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                     strXml += '      <a:p><a:pPr>';
                     strXml += '        <a:defRPr b="0" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">';
                     strXml += '          <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-                    strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
+                    strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
                     strXml += '        </a:defRPr>';
                     strXml += '      </a:pPr></a:p>';
                     strXml += '    </c:txPr>';
@@ -4971,7 +4970,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 strXml +=
                     '        <a:defRPr b="' + (opts.dataLabelFontBold ? 1 : 0) + '" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">';
                 strXml += '          <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-                strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
+                strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
                 strXml += '        </a:defRPr>';
                 strXml += '      </a:pPr></a:p>';
                 strXml += '    </c:txPr>';
@@ -5273,7 +5272,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 strXml += '      <a:p><a:pPr>';
                 strXml += '        <a:defRPr b="0" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">';
                 strXml += '          <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-                strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
+                strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
                 strXml += '        </a:defRPr>';
                 strXml += '      </a:pPr></a:p>';
                 strXml += '    </c:txPr>';
@@ -5413,7 +5412,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 strXml += '      <a:p><a:pPr>';
                 strXml += '        <a:defRPr b="0" i="0" strike="noStrike" sz="' + (opts.dataLabelFontSize || DEF_FONT_SIZE) + '00" u="none">';
                 strXml += '          <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-                strXml += '          <a:latin typeface="' + (opts.dataLabelFontFace || 'Arial') + '"/>';
+                strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
                 strXml += '        </a:defRPr>';
                 strXml += '      </a:pPr></a:p>';
                 strXml += '    </c:txPr>';
@@ -5502,7 +5501,7 @@ function makeChartType(chartType, data, opts, valAxisId, catAxisId, isMultiTypeC
                 strXml += '   <a:p><a:pPr>';
                 strXml += "   <a:defRPr sz=\"" + (opts.dataLabelFontSize || DEF_FONT_SIZE) + "00\" b=\"" + (opts.dataLabelFontBold ? 1 : 0) + "\" i=\"0\" u=\"none\" strike=\"noStrike\">";
                 strXml += '    <a:solidFill>' + createColorElement(opts.dataLabelColor || DEF_FONT_COLOR) + '</a:solidFill>';
-                strXml += "    <a:latin typeface=\"" + (opts.dataLabelFontFace || 'Arial') + "\"/>";
+                strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
                 strXml += '   </a:defRPr>';
                 strXml += '      </a:pPr></a:p>';
                 strXml += '    </c:txPr>';
@@ -5644,7 +5643,7 @@ function makeCatAxis(opts, axisId, valAxisId) {
     strXml += '    <a:pPr>';
     strXml += '    <a:defRPr sz="' + (opts.catAxisLabelFontSize || DEF_FONT_SIZE) + '00" b="' + (opts.catAxisLabelFontBold ? 1 : 0) + '" i="0" u="none" strike="noStrike">';
     strXml += '      <a:solidFill><a:srgbClr val="' + (opts.catAxisLabelColor || DEF_FONT_COLOR) + '"/></a:solidFill>';
-    strXml += '      <a:latin typeface="' + (opts.catAxisLabelFontFace || 'Arial') + '"/>';
+    strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
     strXml += '   </a:defRPr>';
     strXml += '  </a:pPr>';
     strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>';
@@ -5747,7 +5746,7 @@ function makeValAxis(opts, valAxisId) {
     strXml += '    <a:pPr>';
     strXml += '      <a:defRPr sz="' + (opts.valAxisLabelFontSize || DEF_FONT_SIZE) + '00" b="' + (opts.valAxisLabelFontBold ? 1 : 0) + '" i="0" u="none" strike="noStrike">';
     strXml += '        <a:solidFill><a:srgbClr val="' + (opts.valAxisLabelColor || DEF_FONT_COLOR) + '"/></a:solidFill>';
-    strXml += '        <a:latin typeface="' + (opts.valAxisLabelFontFace || 'Arial') + '"/>';
+    strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
     strXml += '      </a:defRPr>';
     strXml += '    </a:pPr>';
     strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>';
@@ -5812,7 +5811,7 @@ function makeSerAxis(opts, axisId, valAxisId) {
     strXml += '    <a:pPr>';
     strXml += '    <a:defRPr sz="' + (opts.serAxisLabelFontSize || DEF_FONT_SIZE) + '00" b="0" i="0" u="none" strike="noStrike">';
     strXml += '      <a:solidFill><a:srgbClr val="' + (opts.serAxisLabelColor || DEF_FONT_COLOR) + '"/></a:solidFill>';
-    strXml += '      <a:latin typeface="' + (opts.serAxisLabelFontFace || 'Arial') + '"/>';
+    strXml += genFontFaceXml(opts.dataLabelFontFace || 'Arial');
     strXml += '   </a:defRPr>';
     strXml += '  </a:pPr>';
     strXml += '  <a:endParaRPr lang="' + (opts.lang || 'en-US') + '"/>';
@@ -5858,7 +5857,7 @@ function genXmlTitle(opts) {
     var layout = opts.titlePos && opts.titlePos.x && opts.titlePos.y
         ? "<c:layout><c:manualLayout><c:xMode val=\"edge\"/><c:yMode val=\"edge\"/><c:x val=\"" + opts.titlePos.x + "\"/><c:y val=\"" + opts.titlePos.y + "\"/></c:manualLayout></c:layout>"
         : "<c:layout/>";
-    return "<c:title>\n\t  <c:tx>\n\t    <c:rich>\n\t      " + rotate + "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        " + align + "\n\t        <a:defRPr " + sizeAttr + " b=\"0\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill><a:srgbClr val=\"" + (opts.color || DEF_FONT_COLOR) + "\"/></a:solidFill>\n\t          <a:latin typeface=\"" + (opts.fontFace || 'Arial') + "\"/>\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr " + sizeAttr + " b=\"0\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill><a:srgbClr val=\"" + (opts.color || DEF_FONT_COLOR) + "\"/></a:solidFill>\n\t          <a:latin typeface=\"" + (opts.fontFace || 'Arial') + "\"/>\n\t        </a:rPr>\n\t        <a:t>" + (encodeXmlEntities(opts.title) || '') + "</a:t>\n\t      </a:r>\n\t    </a:p>\n\t    </c:rich>\n\t  </c:tx>\n\t  " + layout + "\n\t  <c:overlay val=\"0\"/>\n\t</c:title>";
+    return "<c:title>\n\t  <c:tx>\n\t    <c:rich>\n\t      " + rotate + "\n\t      <a:lstStyle/>\n\t      <a:p>\n\t        " + align + "\n\t        <a:defRPr " + sizeAttr + " b=\"0\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill><a:srgbClr val=\"" + (opts.color || DEF_FONT_COLOR) + "\"/></a:solidFill>\n\t          " + genFontFaceXml(opts.fontFace || 'Arial') + "\n\t        </a:defRPr>\n\t      </a:pPr>\n\t      <a:r>\n\t        <a:rPr " + sizeAttr + " b=\"0\" i=\"0\" u=\"none\" strike=\"noStrike\">\n\t          <a:solidFill><a:srgbClr val=\"" + (opts.color || DEF_FONT_COLOR) + "\"/></a:solidFill>\n\t          " + genFontFaceXml(opts.fontFace || 'Arial') + "\n\t        </a:rPr>\n\t        <a:t>" + (encodeXmlEntities(opts.title) || '') + "</a:t>\n\t      </a:r>\n\t    </a:p>\n\t    </c:rich>\n\t  </c:tx>\n\t  " + layout + "\n\t  <c:overlay val=\"0\"/>\n\t</c:title>";
 }
 /**
  * Calc and return excel column name for a given column length
