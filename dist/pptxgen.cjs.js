@@ -1,4 +1,4 @@
-/* PptxGenJS 3.4.0-beta @ 2020-12-11T10:47:16.503Z */
+/* PptxGenJS 3.4.0-beta @ 2020-12-23T03:04:03.625Z */
 'use strict';
 
 var JSZip = require('jszip');
@@ -2146,8 +2146,23 @@ function genXmlParagraphProperties(textObj, isDefault) {
         }
         else if (textObj.options.bullet === false) {
             // We only add this when the user explicitely asks for no bullet, otherwise, it can override the master defaults!
-            paragraphPropXml += " indent=\"0\" marL=\"0\""; // FIX: ISSUE#589 - specify zero indent and marL or default will be hanging paragraph
+            // FIX: ISSUE#589 - specify zero indent and marL or default will be hanging paragraph
+            paragraphPropXml += " indent=\"" + (valToPts(textObj.options.indent) || 0) + "\" marL=\"" + (valToPts(textObj.options.marginLeft) || 0) + "\"";
+            if (textObj.options.marginRight != null) {
+                paragraphPropXml += " marR=\"" + valToPts(textObj.options.marginRight) + "\"";
+            }
             strXmlBullet = '<a:buNone/>';
+        }
+        else {
+            if (textObj.options.indent != null) {
+                paragraphPropXml += " indent=\"" + valToPts(textObj.options.indent) + "\"";
+            }
+            if (textObj.options.marginLeft != null) {
+                paragraphPropXml += " marL=\"" + valToPts(textObj.options.marginLeft) + "\"";
+            }
+            if (textObj.options.marginRight != null) {
+                paragraphPropXml += " marR=\"" + valToPts(textObj.options.marginRight) + "\"";
+            }
         }
         // OPTION: tabStops
         if ((_a = textObj.options.tabStops) === null || _a === void 0 ? void 0 : _a.length) {
