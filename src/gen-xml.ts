@@ -914,8 +914,22 @@ function genXmlParagraphProperties(textObj: ISlideObject | TextProps, isDefault:
 			strXmlBullet = `<a:buSzPct val="100000"/><a:buChar char="${BULLET_TYPES['DEFAULT']}"/>`
 		} else if (textObj.options.bullet === false) {
 			// We only add this when the user explicitely asks for no bullet, otherwise, it can override the master defaults!
-			paragraphPropXml += ` indent="0" marL="0"` // FIX: ISSUE#589 - specify zero indent and marL or default will be hanging paragraph
+			// FIX: ISSUE#589 - specify zero indent and marL or default will be hanging paragraph
+			paragraphPropXml += ` indent="${valToPts(textObj.options.indent) || 0}" marL="${valToPts(textObj.options.marginLeft) || 0}"`
+			if (textObj.options.marginRight != null) {
+				paragraphPropXml += ` marR="${valToPts(textObj.options.marginRight)}"`
+			}
 			strXmlBullet = '<a:buNone/>'
+		} else {
+			if (textObj.options.indent != null) {
+				paragraphPropXml += ` indent="${valToPts(textObj.options.indent)}"`
+			}
+			if (textObj.options.marginLeft != null) {
+				paragraphPropXml += ` marL="${valToPts(textObj.options.marginLeft)}"`
+			}
+			if (textObj.options.marginRight != null) {
+				paragraphPropXml += ` marR="${valToPts(textObj.options.marginRight)}"`
+			}
 		}
 
 		// OPTION: tabStops

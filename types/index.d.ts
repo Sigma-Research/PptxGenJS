@@ -1157,6 +1157,18 @@ declare namespace PptxGenJS {
 					style?: string
 			  }
 		/**
+		 * indent space by points. can be negative.
+		 */
+		indent?: number;
+		/**
+		 * margin left by points
+		 */
+		marginLeft?: number;
+		/**
+		 * margin right by points
+		 */
+		marginRight?: number;
+		/**
 		 * Text color
 		 * - `HexColor` or `ThemeColor`
 		 * @example 'FF0000' // red
